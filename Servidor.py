@@ -3,7 +3,9 @@ from flask_socketio import SocketIO
 import random
 
 app = Flask(__name__)
-socketio = SocketIO(app, async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+
+#socketio = SocketIO(app, async_mode='threading')
 
 @app.route('/')
 def index():
