@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico em Tempo Real</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        canvas {
+        width: 80%;
+        margin: 20px auto;
+        display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gráfico de Linha em Tempo Real</h1>
+    <canvas id="realtimeChart" width="800" height="400"></canvas>
+
+
+    <script>
+        const ctx = document.getElementById('realtimeChart').getContext('2d');
+        const realtimeChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Valor Recebido',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2,
+                    tension: 0
+                }]
+            },
+            options: {
+                animation: {
+                    duration: 500,
+                    easing: 'easeOutQuart'
+                },
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tempo'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Valor'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const socket = io();
+
+        socket.on('temperatura', (data) => {
+            const value = data.value;
+            const timestamp = new Date().toLocaleTimeString();
+
+            realtimeChart.data.labels.push(timestamp);
+            realtimeChart.data.datasets[0].data.push(value);
+
+
+            if (realtimeChart.data.labels.length > 20) {
+                realtimeChart.data.labels.shift();
+                realtimeChart.data.datasets[0].data.shift();
+            }
+
+            realtimeChart.update();
+        });
+    </script>
+</body>
+</html>

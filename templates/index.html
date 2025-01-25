@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Temperature</title>
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Monitoramento de Temperatura</h1>
+    <p>A temperatura atual é: <strong id="temperature">Aguardando dados...</strong> °C</p>
+
+    <script>
+        const socket = io();
+
+        socket.on('temperatura', (data) => {
+            const tempElement = document.getElementById('temperature');
+            tempElement.textContent = data.value;
+            console.log('Temperatura recebida:', data.value);
+        });
+    </script>
+</body>
+</html>
