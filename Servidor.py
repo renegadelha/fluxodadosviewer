@@ -9,6 +9,14 @@ socketio = SocketIO(app, async_mode='threading')
 def index():
     return render_template('index2.html')
 
+
+'''
+@app.route('/receberdado', methods=['POST'])
+def receber_dado():
+    dado = ...
+    socketio.emit('temperatura', {'value': dado})
+'''
+
 def gerar_dados():
     while True:
         temp = random.uniform(20.0, 30.0)
