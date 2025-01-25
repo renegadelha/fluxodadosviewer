@@ -3,6 +3,7 @@ from flask_socketio import SocketIO
 import random
 
 app = Flask(__name__)
+#se for para receber dados so sensor, tem que trocar threading por eventlet. acho que só precisa isso
 socketio = SocketIO(app, async_mode='threading')
 
 @app.route('/')
