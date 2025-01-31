@@ -17,6 +17,7 @@ def receber_dado():
     dado = ...
     socketio.emit('temperatura', {'value': dado})
 '''
+x = 1
 
 def gerar_dados():
     while True:
