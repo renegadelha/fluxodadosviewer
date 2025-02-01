@@ -1,0 +1,67 @@
+import RPi.GPIO as GPIO
+import time
+
+# Definição dos pinos
+TRIG_PIN = 23  # GPIO 23 - Pino físico 16
+ECHO_PIN = 24  # GPIO 24 - Pino físico 18
+SERVO_PIN = 18  # GPIO 18 - Pino físico 12
+
+# Configuração dos pinos
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(TRIG_PIN, GPIO.OUT)
+GPIO.setup(ECHO_PIN, GPIO.IN)
+GPIO.setup(SERVO_PIN, GPIO.OUT)
+
+# Configuração do PWM para o servo
+pwm = GPIO.PWM(SERVO_PIN, 50)  # Frequência de 50Hz
+pwm.start(0)
+
+# Função para medir a distância com o sensor AJ-SR04M
+def medir_distancia():
+    # Enviar pulso de 10µs no Trig
+    GPIO.output(TRIG_PIN, True)
+    time.sleep(0.00001)  # 10µs
+    GPIO.output(TRIG_PIN, False)
+
+    # Esperar pelo sinal de retorno no Echo
+    inicio = time.time()
+    while GPIO.input(ECHO_PIN) == 0:
+        inicio = time.time()
+
+    fim = time.time()
+    while GPIO.input(ECHO_PIN) == 1:
+        fim = time.time()
+
+    # Calcular a distância (tempo * velocidade do som / 2)
+    tempo_decorrido = fim - inicio
+    distancia = (tempo_decorrido * 34300) / 2  # Velocidade do som: 343 m/s
+
+    return round(distancia, 2)
+
+# Função para mover o servo para um ângulo específico
+def set_angle(angle):
+    duty = 2 + (angle / 18)
+    pwm.ChangeDutyCycle(duty)
+    time.sleep(0.5)
+    pwm.ChangeDutyCycle(0)  # Evita jitter
+
+try:
+    while True:
+        distancia = medir_distancia()
+        print(f"Distância: {distancia} cm")
+
+        if distancia > 40:
+            print("Alternando o servo...")
+            set_angle(0)
+            time.sleep(1)
+            set_angle(180)
+            time.sleep(1)
+        else:
+            print("Objeto próximo, servo parado.")
+
+        time.sleep(0.5)  # Pequena pausa
+
+except KeyboardInterrupt:
+    print("\nEncerrando...")
+    pwm.stop()
+    GPIO.cleanup()
